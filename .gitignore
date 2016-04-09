@@ -1,0 +1,5 @@
+node_modeles/
+bower_components/
+dist/
+*.swp
+config.js
