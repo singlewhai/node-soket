@@ -1,0 +1,32 @@
+{
+  "name": "socket",
+  "version": "1.0.0",
+  "description": "to test socket.io with chat",
+  "main": "server.js",
+  "scripts": {
+    "test": "npm server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/singlewhai/node-soket.git"
+  },
+  "keywords": [
+    "socket.io",
+    "realtime",
+    "chat"
+  ],
+  "author": "n.ratanasuwan@gmail.com",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/singlewhai/node-soket/issues"
+  },
+  "homepage": "https://github.com/singlewhai/node-soket#readme",
+  "devDependencies": {
+    "body-parser": "^1.15.0",
+    "feathers": "^2.0.0",
+    "fs": "0.0.2",
+    "method-override": "^2.3.5",
+    "mongoose": "^4.4.12",
+    "path": "^0.12.7"
+  }
+}

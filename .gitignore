@@ -1,6 +1,7 @@
-node_modeles/
+node_modules/
 bower_components/
 mean-chat/
 dist/
 *.swp
 config.js
+npm-debug.log
