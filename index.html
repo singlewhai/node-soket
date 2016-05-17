@@ -11,6 +11,7 @@
       #messages { list-style-type: none; margin: 0; padding: 0; }
       #messages li { padding: 5px 10px; }
       #messages li:nth-child(odd) { background: #eee; }
+      .selected { color: red}
     </style>
   </head>
   <body>
@@ -51,7 +52,6 @@
 
             var clients = [];
             var socket = io("http://127.0.0.1:3000/", { query: "appid=123456789" }); 
-            socket.emit('ready', true);
             socket.on('list', function(data){
                 console.log('list', data);
                 clientList(data);
@@ -60,14 +60,12 @@
                 $('#messages').append($('<li>').text(msg));
             });
             socket.on('private message', function(msg){
-                $('#messages').append($('<li>').text('private : ' + msg));
+                $('#messages').append($('<li>').text(msg));
             });
             function send(){
                 if($('#private').val() == '/#public' || $('#private').val() == ''){
-                    console.log('public');
                     socket.emit('chat message', $('#m').val());
                 }else{
-                    console.log('private');
                     socket.emit('private message', $('#private').val(), $('#m').val());
                 }
             }
@@ -76,13 +74,26 @@
                 data.forEach(function(e){
                     $('#list').append($('<li>').append(createClient(e))); 
                 });
+                defaultSelect();
             }
             function createClient(e){
                 return $('<label  onclick="privateTo(this)" value="' +e+ '" id="' +e.substr(2)+'" for="client">').text(e.substr(2));
             }
-            function privateTo(e){
-                console.log('private to', $(e).attr('value'));
+            function privateTo(e){ 
+                selectClient(e);
                 $('#private').val($(e).attr('value'));
+            }
+            function selectClient(e){
+                var clients = $(e).parent().parent().find('li').toArray(); 
+                clients.forEach(function(client){
+                    $($(client).find('label')[0]).removeClass('selected');
+                });
+                $(e).addClass('selected');
+            }
+            function defaultSelect(){
+                var $clients = $('#list').find('li'); 
+                if($clients.find('.selected').length == 0)
+                    $clients.find('#public').addClass('selected');
             }
             $(function(){
                 $('.input').keypress(function (e) {

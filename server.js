@@ -33,35 +33,35 @@ var socketCon = socket(function(io){
         console.log('a user connected');
         clients.push(socket);
         
-        function sendClientList(clients, currentId){
-            var clientList = [];
-            clients.forEach(function(e){
-                if(e.id === currentId)
-                    clientList.push('/#public');
-                else
-                    clientList.push(e.id); 
+        function sendClientList(clients){
+            clients.forEach(function(client){
+                var clientList = [];
+                clients.forEach(function(e){
+                    if(e.id === client.id)
+                        clientList.push('/#public');
+                    else
+                        clientList.push(e.id); 
+                });
+                io.to(client.id).emit('list', clientList);
             });
-            console.log(currentId, clientList);
-            io.to(currentId).emit('list', clientList);
         }
-        socket.on('ready', function(id){
-            console.log(socket.id, id, 'id');
-            sendClientList(clients, socket.id);
-        });
+        sendClientList(clients);
 
         socket.on('disconnect', function(){
             console.log('user disconnected');
             clients.splice(clients.indexOf(socket), 1);
             clients.forEach(function(client, index) {
                 var client_id = index; // Just use the index in the clients array for now
-                sendClientList(clients, socket.id);
+                sendClientList(clients);
             });
         });
         socket.on('chat message', function(msg){
             io.emit('chat message', msg);
         });
         socket.on('private message', function(id, msg){
-            io.to(id).emit('private message', msg);
+            console.log(id, socket.id, 'private msg');
+            io.to(id).emit('private message', '@'+socket.id.substr(2)+' : '+msg);
+            io.to(socket.id).emit('private message', '@'+id.substr(2)+' : '+msg);
         });
     });
 });
