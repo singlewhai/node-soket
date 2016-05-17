@@ -1,0 +1,26 @@
+{
+  "name": "socket",
+  "description": "to test socket.io with chat",
+  "main": "server.js",
+  "authors": [
+    "n.ratanasuwan@gmail.com"
+  ],
+  "license": "ISC",
+  "keywords": [
+    "socket.io",
+    "realtime",
+    "chat"
+  ],
+  "homepage": "https://github.com/singlewhai/node-soket",
+  "moduleType": [],
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "devDependencies": {
+    "bootstrap": "~3.3.6"
+  }
+}

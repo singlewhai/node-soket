@@ -1,0 +1,106 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Socket.IO chat</title>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body { font: 13px Helvetica, Arial; }
+      form { background: #000; padding: 3px; position: fixed; bottom: 0; width: 100%; }
+      form input { border: 0; padding: 10px; width: 40%; margin-right: .5%; }
+      form button { width: 9%; background: rgb(130, 224, 255); border: none; padding: 10px; }
+      #messages { list-style-type: none; margin: 0; padding: 0; }
+      #messages li { padding: 5px 10px; }
+      #messages li:nth-child(odd) { background: #eee; }
+    </style>
+  </head>
+  <body>
+      <script src="/jquery/dist/jquery.min.js"></script>
+        <script src="/socket.io/socket.io.js"></script>
+        <script>
+            
+
+            // Warn if overriding existing method
+            if(Array.prototype.equals)
+                console.warn("Overriding existing Array.prototype.equals. Possible causes: New API defines the method, there's a framework conflict or you've got double inclusions in your code.");
+            // attach the .equals method to Array's prototype to call it on any array
+            Array.prototype.equals = function (array) {
+                // if the other array is a falsy value, return
+                if (!array)
+                    return false;
+
+                // compare lengths - can save a lot of time 
+                if (this.length != array.length)
+                    return false;
+
+                for (var i = 0, l=this.length; i < l; i++) {
+                    // Check if we have nested arrays
+                    if (this[i] instanceof Array && array[i] instanceof Array) {
+                        // recurse into the nested arrays
+                        if (!this[i].equals(array[i]))
+                            return false;       
+                    }           
+                    else if (this[i] != array[i]) { 
+                        // Warning - two different object instances will never be equal: {x:20} != {x:20}
+                        return false;   
+                    }           
+                }       
+                return true;
+            }
+            // Hide method from for-in loops
+            Object.defineProperty(Array.prototype, "equals", {enumerable: false});
+
+            var clients = [];
+            var socket = io("http://127.0.0.1:3000/", { query: "appid=123456789" }); 
+            socket.emit('ready', true);
+            socket.on('list', function(data){
+                console.log('list', data);
+                clientList(data);
+            });
+            socket.on('chat message', function(msg){
+                $('#messages').append($('<li>').text(msg));
+            });
+            socket.on('private message', function(msg){
+                $('#messages').append($('<li>').text('private : ' + msg));
+            });
+            function send(){
+                if($('#private').val() == '/#public' || $('#private').val() == ''){
+                    console.log('public');
+                    socket.emit('chat message', $('#m').val());
+                }else{
+                    console.log('private');
+                    socket.emit('private message', $('#private').val(), $('#m').val());
+                }
+            }
+            function clientList(data){ 
+                $('#list').html('');
+                data.forEach(function(e){
+                    $('#list').append($('<li>').append(createClient(e))); 
+                });
+            }
+            function createClient(e){
+                return $('<label  onclick="privateTo(this)" value="' +e+ '" id="' +e.substr(2)+'" for="client">').text(e.substr(2));
+            }
+            function privateTo(e){
+                console.log('private to', $(e).attr('value'));
+                $('#private').val($(e).attr('value'));
+            }
+            $(function(){
+                $('.input').keypress(function (e) {
+                    if (e.which == 13) {
+                        send();
+                    }
+                });
+            });
+        </script>
+    <div style="float:left;width:50%">
+        <ul id="list"></ul>
+        <input id="private" type="hidden"/>
+    </div>
+    <div style="float:right;width:50%">
+        <ul id="messages"></ul>
+        <form method="GET">
+            <input id="m" autocomplete="off" /><button type="button" onclick="send()">Send</button>
+        </form>
+    </div>
+  </body>
+</html>
